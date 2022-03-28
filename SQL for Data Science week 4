@@ -394,11 +394,128 @@ Part 2: Inferences and Analysis
 Compare the businesses with 2-3 stars to the businesses with 4-5 stars and answer the following questions. Include your code.
 	
 i. Do the two groups you chose to analyze have a different distribution of hours?
-
+	Yes
 
 ii. Do the two groups you chose to analyze have a different number of reviews?
-         
+        Yes 
          
 iii. Are you able to infer anything from the location data provided between these two groups? Explain.
-
+	No. Every business is in different locations. 
+	
 SQL code used for analysis:
+
+SELECT
+business.name, business.city, category.category, business.stars,
+hours.hours, business.review_count, business.postal_code
+FROM (business inner join category ON business.id = category.business_id) 
+inner join hours ON hours.business_id = category.business_id
+WHERE business.city = 'Las Vegas' 
+GROUP BY business.stars;
+
+
+2. Group business based on the ones that are open and the ones that are closed. 
+What differences can you find between the ones that are still open and the ones that are closed? List at least two differences and 
+the SQL code you used to arrive at your answer.
+		
+i. Difference 1:
+     Average rating for business that are open is higher than the ones that are closed    
+         
+ii. Difference 2:
+        Average review_count for business that are open is higher than the ones that are closed 
+         
+         
+SQL code used for analysis
+
++---------------------+-------------------+-------------------+---------------+---------+
+| COUNT(DISTINCT(id)) | AVG(review_count) | SUM(review_count) |    AVG(stars) | is_open |
++---------------------+-------------------+-------------------+---------------+---------+
+|                1520 |     23.1980263158 |             35261 | 3.52039473684 |       0 |
+|                8480 |     31.7570754717 |            269300 | 3.67900943396 |       1 |
++---------------------+-------------------+-------------------+---------------+---------+
+
+SELECT COUNT(DISTINCT(id)),
+			   AVG(review_count),
+			   SUM(review_count),
+			   AVG(stars),
+			   is_open
+		FROM business
+		GROUP BY is_open
+
+
+
+3. For this last part of your analysis, you are going to choose the type of analysis you want to conduct on the Yelp dataset and 
+are going to prepare the data for analysis.
+
+Ideas for analysis include: Parsing out keywords and business attributes for sentiment analysis, clustering businesses to find commonalities or 
+anomalies between them, predicting the overall star rating for a business, predicting the number of fans a user will have, and so on. 
+These are just a few examples to get you started, so feel free to be creative and come up with your own problem you want to solve. 
+Provide answers, in-line, to all of the following:
+	
+i. Indicate the type of analysis you chose to do:
+         Corelation between date of likes and ratings in reviews
+         
+ii. Write 1-2 brief paragraphs on the type of data you will need for your analysis and why you chose that data:
+         I choose to include three sets: stars, likes and date and sorted them by descending order. 
+	 Then I will analyze their star ratings, number of likes and date so that I can get some insights as to which business is popular on a day to day basis
+	 and if likes have any coorelation was business reviews on yelp.                   
+                  
+iii. Output of your finished dataset:
+         
++-------+-------+---------------------+
+| stars | likes | date                |
++-------+-------+---------------------+
+|     5 |     1 | 2015-02-04 00:00:00 |
+|     5 |     1 | 2016-01-29 00:00:00 |
+|     5 |     1 | 2016-08-10 00:00:00 |
+|     5 |     1 | 2015-11-06 00:00:00 |
+|     5 |     1 | 2015-02-04 00:00:00 |
+|     5 |     1 | 2016-01-29 00:00:00 |
+|     5 |     1 | 2016-08-10 00:00:00 |
+|     5 |     1 | 2015-11-06 00:00:00 |
+|     3 |     1 | 2015-12-22 00:00:00 |
+|     3 |     2 | 2014-02-18 00:00:00 |
+|     4 |     1 | 2014-11-26 00:00:00 |
+|     4 |     1 | 2015-02-04 00:00:00 |
+|     4 |     1 | 2016-01-29 00:00:00 |
+|     4 |     1 | 2016-08-10 00:00:00 |
+|     4 |     1 | 2015-11-06 00:00:00 |
+|     4 |     1 | 2014-12-14 00:00:00 |
+|     4 |     1 | 2014-11-15 00:00:00 |
+|     4 |     1 | 2016-03-18 00:00:00 |
+|     4 |     1 | 2015-09-27 00:00:00 |
+|     4 |     1 | 2015-09-04 00:00:00 |
+|     4 |     1 | 2014-07-26 00:00:00 |
+|     4 |     1 | 2015-04-18 00:00:00 |
+|     4 |     1 | 2014-08-20 00:00:00 |
+|     4 |     1 | 2014-11-19 00:00:00 |
+|     4 |     1 | 2014-09-06 00:00:00 |
++-------+-------+---------------------+
+(Output limit exceeded, 25 of 1227 total rows shown)
+         
+iv. Provide the SQL code you used to create your final dataset:
+
+SELECT
+review.stars, 
+tip.likes, 
+tip.date
+FROM (review INNER JOIN tip ON review.user_id = tip.user_id)
+ORDER BY tip.date  AND tip.likes DESC ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
