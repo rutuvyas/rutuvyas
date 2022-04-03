@@ -1,0 +1,177 @@
+Week-1 
+Error codes: 
+
+Exercise 1:
+Goal: Here we use users table to pull a list of user email addresses. Edit the query to pull email
+addresses, but only for non-deleted users.
+Starter Code:
+SELECT *
+FROM dsv1069.users
+
+Correct answer: 
+SELECT email_address
+FROM dsv1069.users
+WHERE deleted_at is NULL;
+
+answer on Mode after running query:
+  email_address
+1	ArataHopper@earthlink.info
+2	Riya_Gruber1974@mail.net
+3	Peter_Sousa@yahoo.info
+4	D_Kowalski1962@gmail.com
+5	SNovak1966@mail.com
+6	Robot_Santos@yahoo.biz
+7	Luis_Wilson1996@inbox.org
+8	D_Powell1991@yahoo.edu
+9	E_Hernandez1990@gmail.biz
+10	L_McRobot@gmail.com
+11	F_Fourie@earthlink.net
+12	Katherine_Hassan1954@outlook.com
+13	Grace_Kumar@gmail.com
+14	Ben_Korhonen@gmail.net
+15	M_Computer@gmail.com  
+
+Exercise 2:
+--Goal: Use the items table to count the number of items for sale in each category
+Starter Code: (none)
+Answer:
+SELECT 
+  category, 
+  COUNT(*) as item_count
+FROM dsv1069.items
+GROUP BY category
+ORDER BY 2 DESC;
+
+  Category |  Item COUNT
+1	instrument	239
+2	gadget	233
+3	module	227
+4	mechanism	225
+5	tool	222
+6	device	216
+7	widget	212
+8	dongle	211
+9	apparatus	207
+10	contraption	206
+
+Exercise 3:
+--Goal: Select all of the columns from the result when you JOIN the users table to the orders table
+Answer: 
+SELECT *
+FROM dsv1069.orders
+JOIN dsv1069.users
+ON orders.user_id = users.id;
+
+1	225682	340168	158891	920	fuzzy apparatus opener	apparatus	150	2017-03-18 22:38:13	2017-03-19 13:10:44
+2	225682	345073	158891	85	reflective apparatus	apparatus	390	2017-03-18 22:38:13	2017-03-19 13:10:44
+3	225682	266169	158891	93	reflective apparatus wrapper	apparatus	156	2017-03-18 22:38:13	2017-03-19 13:10:44
+4	225682	148386	158891	2720	rechargable apparatus	apparatus	390	2017-03-18 22:38:13	2017-03-19 13:10:44
+5	229848	59244	93994	3629	digital apparatus opener	apparatus	165	2016-02-18 04:30:15	2016-02-20 15:08:49
+6	229848	94696	93994	3360	apparatus opener	apparatus	150	2016-02-18 04:30:15	2016-02-20 15:08:49
+7	88655	287644	64712	137	organic dongle refill	dongle	36	2015-09-05 09:37:12	2015-09-07 01:07:35
+8	272561	397449	196712	1730	matte contraption	contraption	312.5	2017-10-08 04:03:50	2017-10-07 20:35:09
+9	272561	21181	196712	3376	rechargable contraption	contraption	325	2017-10-08 04:03:50	2017-10-07 20:35:09
+10	272561	362396	196712	2256	matte contraption storage_unit	contraption	781.25	2017-10-08 04:03:50	2017-10-07 20:35:09
+11	272561	56549	196712	2580	analog contraption	contraption	225	2017-10-08 04:03:50	2017-10-07 20:35:09
+12	345139	65410	196460	3937	industrial-strength contraption wrapper	contraption	300	2017-07-26 20:40:30	2017-07-25 23:22:35
+13	345139	375647	196460	3109	glossy contraption	contraption	300	2017-07-26 20:40:30	2017-07-25 23:22:35
+14	345139	395073	196460	1204	fuzzy contraption	contraption	250	2017-07-26 20:40:30	2017-07-25 23:22:35
+
+Exercise 4:
+--Goal: Check out the query below. This is not the right way to count the number of viewed_item
+events. Determine what is wrong and correct the error.
+
+Starter Code:
+SELECT
+COUNT(event_id) AS events
+FROM dsv1069.events
+WHERE event_name = ‘view_item’
+
+Correct answer: 
+SELECT COUNT(DISTINCT event_id) AS events
+FROM dsv1069.events
+WHERE event_name = 'view_item';
+ 
+answer:	262786
+
+
+Exercise 5:
+--Goal:Compute the number of items in the items table which have been ordered. The query below runs, but it isn’t right. 
+Determine what is wrong and correct the error or start from scratch.
+Starter Code:
+--Error: This query runs but the number isn’t right
+
+Answer: 
+SELECT 
+COUNT(DISTINCT o.item_id) AS item_count
+FROM dsv1069.orders o;
+
+answer: item_count =2198
+
+
+Exercise 6:
+--Goal: For each user figure out IF a user has ordered something, and when their first purchase
+was. The query below doesn’t return info for any of the users who haven’t ordered anything.
+Starter Code:
+
+Answer: 
+SELECT users.id as user_id,
+  MIN(orders.paid_at) AS min_paid_at
+  FROM dsv1069.users
+LEFT JOIN dsv1069.orders
+  ON users.id = orders.user_id
+  GROUP BY users.id
+ORDER BY min_paid_at DESC;
+
+answer on mode after running query:
+  user_id | min_paid_at
+1	293
+2	298
+3	286
+4	288
+5	297
+6	273
+7	240
+8	23
+9	283
+10	280
+11	231
+12	253
+
+
+Exercise 7:
+--Goal: Figure out what percent of users have ever viewed the user profile page, but this query
+isn’t right. Check to make sure the number of users adds up, and if not, fix the query.
+Starter Code
+
+Answer: 
+SELECT (
+		CASE 
+			WHEN first_view IS NULL
+				THEN false
+			ELSE true
+			END
+		) AS has_viewed_profile_page,
+	COUNT(user_id) AS users
+
+-- creates first_profile_views table
+FROM (
+	SELECT users.id AS user_id,
+		MIN(event_time) AS first_view
+	
+	FROM dsv1069.users
+	
+	LEFT JOIN dsv1069.events
+		ON events.user_id = users.id
+		AND event_name = 'view_user_profile'
+	
+	GROUP BY users.id
+	) first_profile_views
+
+GROUP BY has_viewed_profile_page;
+
+answer on mode after running above query: 
+  had_viewed_profile_page | users
+1	false                   	114143
+2	true	                    3035
+
